@@ -1,6 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using RazorMovies.Data;
+using RazorMovies.Models;
+using RazorMovies.SeedData;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -9,6 +12,12 @@ builder.Services.AddDbContext<RazorMoviesContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("RazorMoviesContext") ?? throw new InvalidOperationException("Connection string 'RazorMoviesContext' not found.")));
 
 var app = builder.Build();
+
+using(var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    SeedData.Initialize(services);
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
